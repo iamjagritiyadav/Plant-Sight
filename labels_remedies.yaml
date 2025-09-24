@@ -1,0 +1,134 @@
+# labels_remedies.yaml
+classes:
+  0:
+    name: "American Bollworm on Cotton"
+    remedy: "Monitor bolls, remove damaged bolls, use pheromone traps/targeted insecticide and Bt varieties; rotate crops."
+  1:
+    name: "Anthracnose on Cotton"
+    remedy: "Remove infected debris, increase air circulation, apply appropriate fungicide and use resistant varieties."
+  2:
+    name: "Army worm"
+    remedy: "Handpick or use biocontrols/targeted insecticides; maintain healthy crop borders and timely scouting."
+  3:
+    name: "Bacterial Blight in cotton"
+    remedy: "Remove infected plant parts, avoid overhead irrigation, improve drainage; use approved bactericides."
+  4:
+    name: "Becterial Blight in Rice"
+    remedy: "Use clean seed, balanced fertilizer, flood/dry management and registered bactericides; follow local extension advice."
+  5:
+    name: "Brownspot"
+    remedy: "Use resistant varieties, balanced nutrients and foliar fungicides if needed; avoid prolonged leaf wetness."
+  6:
+    name: "Common_Rust"
+    remedy: "Remove alternate hosts, use rust-resistant varieties and fungicide sprays timed to infection risk."
+  7:
+    name: "Cotton Aphid"
+    remedy: "Use neem/soap sprays or biological controls; conserve predators (ladybugs); avoid excess nitrogen."
+  8:
+    name: "Flag Smut"
+    remedy: "Use certified seed, seed treatment and crop rotation; follow local fungicide recommendations."
+  9:
+    name: "Gray_Leaf_Spot"
+    remedy: "Remove infected leaves, improve airflow, apply fungicide when needed and avoid overhead watering."
+  10:
+    name: "Healthy Maize"
+    remedy: "No disease detected — maintain good agronomic practices and regular scouting."
+  11:
+    name: "Healthy Wheat"
+    remedy: "Healthy — keep crop rotation, timely fungicide if risk appears, and good nutrition."
+  12:
+    name: "Healthy cotton"
+    remedy: "Healthy — continue best-practices: balanced irrigation, nutrition and monitoring."
+  13:
+    name: "Leaf Curl"
+    remedy: "Prune affected parts, use resistant varieties, remove heavily infested plants and use vector control."
+  14:
+    name: "Leaf smut"
+    remedy: "Use resistant varieties, seed treatment and fungicide where recommended; improve field hygiene."
+  15:
+    name: "Mosaic sugarcane"
+    remedy: "Remove infected stools, use resistant varieties, maintain balanced nutrition and follow extension guidance."
+  16:
+    name: "RedRot sugarcane"
+    remedy: "Sanitation, remove infected canes, use resistant varieties and follow recommended fungicide schedule."
+  17:
+    name: "RedRust sugarcane"
+    remedy: "Use resistant varieties, cultural sanitation, and fungicides as per local advice."
+  18:
+    name: "Rice Blast"
+    remedy: "Use resistant varieties, proper spacing, timely fungicide and water management; remove infected plants."
+  19:
+    name: "Sugarcane Healthy"
+    remedy: "Healthy — maintain good field hygiene, nutrition and pest monitoring."
+  20:
+    name: "Tungro"
+    remedy: "Viral disease — remove infected plants, control vectors (insects), use resistant varieties and healthy seed."
+  21:
+    name: "Wheat Brown leaf Rust"
+    remedy: "Remove infected debris, apply rust control measures and use resistant varieties."
+  22:
+    name: "Wheat Brown leaf rust"
+    remedy: "See entry 21 — sanitation, resistant varieties and fungicide where applicable."
+  23:
+    name: "Wheat Stem fly"
+    remedy: "Early sowing, remove residues, use tolerant varieties and insecticide seed treatment if recommended."
+  24:
+    name: "Wheat aphid"
+    remedy: "Monitor, release/encourage natural enemies, use targeted insecticides only if threshold exceeded."
+  25:
+    name: "Wheat black rust"
+    remedy: "Plant resistant varieties, monitor and apply fungicide at key growth stages."
+  26:
+    name: "Wheat leaf blight"
+    remedy: "Crop rotation, avoid dense stands, treat with fungicide when needed."
+  27:
+    name: "Wheat mite"
+    remedy: "Use miticides or oils, conserve predators and avoid excessive use of broad-spectrum insecticides."
+  28:
+    name: "Wheat powdery mildew"
+    remedy: "Improve airflow, timely fungicides and grow resistant varieties."
+  29:
+    name: "Wheat scab"
+    remedy: "Crop rotation, resistant varieties, and fungicide seed treatment where advised."
+  30:
+    name: "Wheat___Yellow_Rust"
+    remedy: "Plant resistant varieties, monitor and apply fungicide at early signs."
+  31:
+    name: "Wilt"
+    remedy: "Diagnose (fungal/bacterial/physiological), use resistant varieties and improve drainage; remove infected plants."
+  32:
+    name: "Yellow Rust Sugarcane"
+    remedy: "Use resistant varieties, fungicide sprays and sanitation."
+  33:
+    name: "bacterial_blight in Cotton"
+    remedy: "Remove infected material, control vectors, and use clean seed/approved treatments."
+  34:
+    name: "bollrot on Cotton"
+    remedy: "Improve air flow, avoid late-season wetness, timely insect control to prevent fruit damage."
+  35:
+    name: "bollworm on Cotton"
+    remedy: "Monitor, use pheromone traps/Bt or targeted insecticides and timely scouting."
+  36:
+    name: "cotton mealy bug"
+    remedy: "Release natural enemies, use insecticidal soaps/oils and remove heavily infested plants."
+  37:
+    name: "cotton whitefly"
+    remedy: "Use yellow sticky traps, natural enemies, and insecticidal soaps or targeted sprays if needed."
+  38:
+    name: "maize ear rot"
+    remedy: "Manage moisture at harvest, use resistant hybrids and proper storage."
+  39:
+    name: "maize fall armyworm"
+    remedy: "Early detection, biopesticides (Bt), targeted insecticides and field sanitation."
+  40:
+    name: "maize stem borer"
+    remedy: "Use pheromone traps, resistant varieties and stem borer management practices."
+  41:
+    name: "pink bollworm in cotton"
+    remedy: "Pheromone traps, cultural controls and timely insecticide targeting larvae."
+  42:
+    name: "red cotton bug"
+    remedy: "Hand-pick high populations, use insecticide when threshold crossed and field sanitation."
+  43:
+    name: "thirps on  cotton"
+    remedy: "Monitor, use reflective mulch, conserve predators and apply insecticidal soap/targeted insecticide if needed."
