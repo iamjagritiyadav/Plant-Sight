@@ -1,19 +1,24 @@
 # app.py - Plant Sight (Polished & Responsive UI)
-import os, io, base64, traceback
+import os, io, base64, traceback, subprocess, sys
 import streamlit as st
 from PIL import Image
 import numpy as np
 
-# Try to import ultralytics.YOLO lazily so app fails clearly if missing
-import subprocess
-import sys
-
-# Install ultralytics if not available
+# ---------------- Ensure ultralytics available (runtime fallback) ----------------
+YOLO = None
 try:
-    import ultralytics
-except ImportError:
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "ultralytics"])
-    import ultralytics
+    # try normal import first
+    from ultralytics import YOLO as _YOLO
+    YOLO = _YOLO
+except Exception:
+    # try to install and import
+    try:
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "ultralytics"])
+        from ultralytics import YOLO as _YOLO
+        YOLO = _YOLO
+    except Exception:
+        # leave YOLO as None; load_model_safe will raise a clear error
+        YOLO = None
 
 # ---------------- Config ----------------
 MODEL_PATH = "best.pt"  # ensure this file exists next to app.py
@@ -432,3 +437,5 @@ if uploaded:
 st.markdown('</div>', unsafe_allow_html=True)
 
 st.markdown('<div class="footer">Plant Sight • Fast disease ID • Guidance only — consult local extension for chemicals & dosages</div>', unsafe_allow_html=True)
+
+
