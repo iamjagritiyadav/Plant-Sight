@@ -1,12 +1,11 @@
-import sys, traceback
+import sys, subprocess, platform
 import streamlit as st
 st.write("Python:", sys.version)
-try:
-    import ultralytics
-    st.write("ultralytics:", ultralytics.__version__)
-except Exception as e:
-    st.write("ultralytics import error:", repr(e))
-    st.write(traceback.format_exc())
+st.write("Platform:", platform.platform())
+# check libGL presence
+import shutil, os
+st.write("libGL exists:", bool(shutil.which("ldconfig") and os.path.exists("/usr/lib/x86_64-linux-gnu/libGL.so.1")))
+
 # app.py - Plant Sight (Polished & Responsive UI)
 import os, io, base64, traceback, subprocess, sys
 import streamlit as st
@@ -446,6 +445,7 @@ if uploaded:
 st.markdown('</div>', unsafe_allow_html=True)
 
 st.markdown('<div class="footer">Plant Sight • Fast disease ID • Guidance only — consult local extension for chemicals & dosages</div>', unsafe_allow_html=True)
+
 
 
 
