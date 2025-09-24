@@ -1,11 +1,26 @@
-# app.py — Plant Sight (full file with YAML remedies, confidence gate, rejected-image logging)
+# app.py — Plant Sight (complete, production-friendly)
+"""
+Plant Sight - Streamlit app for crop disease detection.
+
+Requirements (install at build time / in your environment):
+  - streamlit
+  - ultralytics
+  - torch
+  - torchvision
+  - pillow
+  - numpy
+  - pyyaml
+
+Notes:
+ - This file intentionally avoids attempting long runtime pip installs.
+ - Use runtime.txt / packages.txt on Streamlit Cloud to ensure system libs (libGL) and Python version.
+"""
+
 import os
 import io
 import sys
-import time
 import base64
 import traceback
-import subprocess
 from datetime import datetime
 
 import streamlit as st
@@ -13,50 +28,39 @@ from PIL import Image
 import numpy as np
 import yaml
 
-# ---------------- Try import ultralytics (best-effort) ----------------
-YOLO = None
-try:
-    from ultralytics import YOLO as _YOLO
-    YOLO = _YOLO
-except Exception as e:
-    # Try one-time pip install (only if absolutely missing) — runtimes prefer build-time deps
-    try:
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "ultralytics"])
-        from ultralytics import YOLO as _YOLO
-        YOLO = _YOLO
-    except Exception:
-        YOLO = None  # load_model_safe will raise a clear error later
-
 # ---------------- Config ----------------
-MODEL_PATH = "best.pt"
+MODEL_PATH = "best.pt"          # place your trained model next to app.py
 TOP_K = 3
-CONF_THRESHOLD = 0.70   # require >=70% to show prediction/remedy
+CONF_THRESHOLD = 0.70          # require >= 0.70 confidence to show prediction/remedy
 REJECTED_DIR = "rejected"
+CROP_KEYWORDS = ["cotton", "maize", "wheat", "rice", "sugarcane"]  # used to reject non-crop images
 
 os.makedirs(REJECTED_DIR, exist_ok=True)
 
-# ---------------- Page + CSS ----------------
+# ---------------- UI CSS ----------------
 st.set_page_config(page_title="Plant Sight", page_icon="🌿", layout="wide")
-
 CSS = """<style>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap');
 :root{ --brand-green:#178f2d; --muted:#9aa4ad; }
 body { background: #071016; color: #E6EEF3; font-family: 'Poppins', sans-serif; }
 .header { display:flex; align-items:center; gap:16px; padding:18px; background: var(--brand-green); border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,0.5); }
 .logo-box { width:64px; height:64px; border-radius:12px; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,0.06); }
-.title { font-size:30px; font-weight:900; color:white; margin:0; }
-.subtitle { color:rgba(255,255,255,0.92); margin-top:2px; font-size:14px; }
-.container { margin-top:22px; max-width:920px; margin-left:auto; margin-right:auto; }
-.card { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:12px; padding:24px; box-shadow: 0 8px 30px rgba(2,6,12,0.6); border: 1px solid rgba(255,255,255,0.05); }
-.hero-title { font-size:38px; font-weight:900; margin:0; }
-.hero-desc { color:#cde6d9; margin-top:10px; font-size:16px; }
-.uploader { margin-top:22px; padding:18px; background:#0c1113; border-radius:10px; border:1px solid rgba(255,255,255,0.03); text-align: center; }
-.pred-item { background: rgba(255,255,255,0.02); padding:12px; border-radius:10px; }
-.conf-bar { height:12px; background: rgba(255,255,255,0.06); border-radius:999px; overflow:hidden; }
+.title { font-size:28px; font-weight:900; color:white; margin:0; }
+.subtitle { color:rgba(255,255,255,0.92); margin-top:2px; font-size:13px; }
+.container { margin-top:22px; max-width:1100px; margin-left:auto; margin-right:auto; }
+.card { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:12px; padding:20px; box-shadow: 0 8px 30px rgba(2,6,12,0.6); border: 1px solid rgba(255,255,255,0.04); }
+.hero-title { font-size:34px; font-weight:900; margin:0; }
+.hero-desc { color:#cde6d9; margin-top:10px; font-size:15px; }
+.uploader { margin-top:18px; padding:14px; background:#0c1113; border-radius:10px; border:1px solid rgba(255,255,255,0.03); text-align: center; }
+.conf-bar { height:12px; background: rgba(255,255,255,0.06); border-radius:999px; overflow:hidden; margin-top:8px; }
 .conf-fill { height:100%; background: linear-gradient(90deg,#178f2d,#2de36a); transition: width 0.5s ease-in-out; }
+.small { color:#9aa4ad; font-size:13px; }
 .footer { margin-top:30px; color:var(--muted); font-size:12px; text-align:center; }
 .stButton>button { background-color: #178f2d; color: white; font-weight: 600; border-radius: 8px; border: none; }
-.small { color: #9aa4ad; font-size:13px; }
+@media (max-width: 768px) {
+  .header { flex-direction: column; text-align:center; }
+  .hero-title { font-size:24px; }
+}
 </style>"""
 st.markdown(CSS, unsafe_allow_html=True)
 
@@ -72,9 +76,9 @@ def image_bytes(pil_img):
     pil_img.save(buf, format="PNG")
     return buf.getvalue()
 
-def save_rejected_upload(uploaded_bytes, reason="low_confidence"):
+def save_rejected_upload(uploaded_bytes: bytes, reason: str = "rejected"):
     ts = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
-    fname = f"rejected/{reason}_{ts}.png"
+    fname = os.path.join(REJECTED_DIR, f"{reason}_{ts}.png")
     try:
         with open(fname, "wb") as f:
             f.write(uploaded_bytes)
@@ -82,31 +86,59 @@ def save_rejected_upload(uploaded_bytes, reason="low_confidence"):
         pass
     return fname
 
+def normalize_conf(c):
+    """Return confidence as float in 0..1 space. Accepts 0..1 or 0..100."""
+    try:
+        f = float(c)
+    except Exception:
+        return 0.0
+    if f > 1.0:
+        f = f / 100.0
+    if f < 0: f = 0.0
+    if f > 1.0: f = 1.0
+    return f
+
+def is_crop_name(name: str):
+    if not name: return False
+    n = name.lower()
+    return any(kw in n for kw in CROP_KEYWORDS)
+
+# ---------------- Model import (do NOT pip install here) ----------------
+YOLO = None
+try:
+    from ultralytics import YOLO as _YOLO
+    YOLO = _YOLO
+except Exception as e:
+    # Provide useful message in-streamlit UI rather than trying to install
+    st.error("ultralytics import failed. Make sure your environment has 'ultralytics' installed (build-time).")
+    st.write("Detailed error:", str(e))
+    st.stop()
+
 def load_model_safe(path):
     if YOLO is None:
-        raise RuntimeError("ultralytics not installed. Install with: pip install ultralytics (or fix requirements on your platform).")
+        raise RuntimeError("ultralytics not available")
     try:
         return YOLO(path)
     except Exception:
         try:
             return YOLO(path, device="cpu")
         except Exception as e:
-            raise e
+            raise
 
 def extract_topk_from_result(result, k=TOP_K):
-    # robust extraction supporting probs or boxes
+    """Robustly extract top-k (class_id, confidence) tuples from ultralytics result."""
     try:
         probs_obj = getattr(result, "probs", None)
         if probs_obj is not None:
-            # try topk-like behavior
+            # try numpy array conversion
             try:
                 arr = np.array(probs_obj).flatten()
                 if arr.size:
-                    ids = np.argsort(-arr)[:k]
-                    return [(int(i), float(arr[i])) for i in ids]
+                    idxs = np.argsort(-arr)[:k]
+                    return [(int(i), float(arr[i])) for i in idxs]
             except Exception:
                 pass
-            # fallback to top1 fields
+            # fallback to top1/top1conf
             try:
                 if hasattr(probs_obj, "top1") and hasattr(probs_obj, "top1conf"):
                     return [(int(probs_obj.top1), float(probs_obj.top1conf))]
@@ -117,21 +149,20 @@ def extract_topk_from_result(result, k=TOP_K):
     # fallback to boxes
     try:
         boxes = getattr(result, "boxes", None)
-        if boxes:
-            cls_list, conf_list = [], []
+        if boxes and len(boxes) > 0:
+            pairs = []
             for b in boxes:
                 try:
-                    cls_list.append(int(b.cls)); conf_list.append(float(b.conf))
+                    pairs.append((int(b.cls), float(b.conf)))
                 except Exception:
                     pass
-            if cls_list:
-                pairs = sorted(zip(cls_list, conf_list), key=lambda x:-x[1])[:k]
-                return [(int(c), float(s)) for c,s in pairs]
+            pairs = sorted(pairs, key=lambda x: -x[1])[:k]
+            return pairs
     except Exception:
         pass
     return []
 
-# ---------------- Load labels & remedies from YAML ----------------
+# ---------------- Load labels/remedies YAML ----------------
 def load_labels_remedies(path="labels_remedies.yaml"):
     if not os.path.exists(path):
         return None, None
@@ -142,7 +173,9 @@ def load_labels_remedies(path="labels_remedies.yaml"):
         return None, None
     class_map = {}
     remedies_full = {}
-    for k, v in (data.items() if isinstance(data, dict) else []):
+    if not isinstance(data, dict):
+        return None, None
+    for k, v in data.items():
         try:
             kid = int(k)
         except Exception:
@@ -151,7 +184,7 @@ def load_labels_remedies(path="labels_remedies.yaml"):
         remedies_full[kid] = v
     return class_map, remedies_full
 
-# Built-in fallback for class mapping + short remedies (used only if YAML missing)
+# Fallback built-in mapping & minimal remedy
 BUILTIN_CLASS_MAPPING = {
   0: "American Bollworm on Cotton",1: "Anthracnose on Cotton",2: "Army worm",3: "Bacterial Blight in cotton",
   4: "Becterial Blight in Rice",5: "Brownspot",6: "Common_Rust",7: "Cotton Aphid",8: "Flag Smut",
@@ -163,16 +196,14 @@ BUILTIN_CLASS_MAPPING = {
   34: "bollrot on Cotton",35: "bollworm on Cotton",36: "cotton mealy bug",37: "cotton whitefly",38: "maize ear rot",
   39: "maize fall armyworm",40: "maize stem borer",41: "pink bollworm in cotton",42: "red cotton bug",43: "thirps on  cotton"
 }
-
-# minimal remedies fallback
-BUILTIN_REMEDIES = {k: "General guidance: consult labels and local extension." for k in BUILTIN_CLASS_MAPPING.keys()}
+BUILTIN_REMEDIES_SHORT = {k: "General guidance — consult local extension for crop-specific chemical/dosage." for k in BUILTIN_CLASS_MAPPING.keys()}
 
 # Load YAML if present
 CLASS_MAPPING, REMEDIES_FULL = load_labels_remedies("labels_remedies.yaml")
 if CLASS_MAPPING is None:
     CLASS_MAPPING = BUILTIN_CLASS_MAPPING
 if REMEDIES_FULL is None:
-    REMEDIES_FULL = {k: {"name": CLASS_MAPPING.get(k, f"Class {k}"), "summary": BUILTIN_REMEDIES.get(k, ""), "details": BUILTIN_REMEDIES.get(k, "")} for k in CLASS_MAPPING.keys()}
+    REMEDIES_FULL = {k: {"name": CLASS_MAPPING.get(k, f"Class {k}"), "summary": BUILTIN_REMEDIES_SHORT.get(k, ""), "details": BUILTIN_REMEDIES_SHORT.get(k, "")} for k in CLASS_MAPPING.keys()}
 
 # ---------------- Header UI ----------------
 logo_file = find_logo_file()
@@ -193,20 +224,23 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
+# ---------------- Main container ----------------
 st.markdown('<div class="container">', unsafe_allow_html=True)
+
+# Hero / intro
 st.markdown('<div class="card">', unsafe_allow_html=True)
 st.markdown('<div class="hero-title">Plant Sight — Protect your crop, protect your livelihood</div>', unsafe_allow_html=True)
-st.markdown('<div class="hero-desc">Upload a clear close-up photo of the affected part (leaf, stem, boll, ear). The app will only identify crop pests/diseases.</div>', unsafe_allow_html=True)
+st.markdown('<div class="hero-desc">Upload a clear close-up of the affected plant part (leaf, stem, boll, ear). The app detects crop pests/diseases and gives actionable guidance. If unsure, it will ask you to retake or crop the photo.</div>', unsafe_allow_html=True)
 st.markdown('</div>', unsafe_allow_html=True)
 
-# ---------------- Uploader ----------------
+# Uploader
 st.markdown('<div class="uploader card">', unsafe_allow_html=True)
 uploaded = st.file_uploader("Drag and drop file here", type=["jpg","jpeg","png"])
 st.markdown('</div>', unsafe_allow_html=True)
 
-# ---------------- Model load ----------------
+# Model check
 if not os.path.exists(MODEL_PATH):
-    st.error(f"Model file not found: {MODEL_PATH}. Place your trained model next to app.py and rename to {MODEL_PATH}")
+    st.error(f"Model file not found: {MODEL_PATH}. Place your trained model next to app.py and name it {MODEL_PATH}")
     st.stop()
 
 try:
@@ -218,7 +252,6 @@ except Exception as e:
 
 # ---------------- When uploaded -> predict & show ----------------
 if uploaded:
-    # read bytes for possible saving
     try:
         uploaded_bytes = uploaded.getvalue()
     except Exception:
@@ -227,45 +260,39 @@ if uploaded:
     try:
         pil = Image.open(io.BytesIO(uploaded_bytes)).convert("RGB")
     except Exception:
-        st.error("Unable to read the image. Try another file.")
+        st.error("Unable to read uploaded image. Try another file.")
         st.stop()
 
     with st.spinner("Analyzing image..."):
         try:
             results = MODEL.predict(pil, save=False, verbose=False)
             r = results[0]
-            preds = extract_topk_from_result(r, k=TOP_K)  # list of (class_id, conf)
+            preds_raw = extract_topk_from_result(r, k=TOP_K)   # list of (id, conf)
         except Exception as e:
             st.error("Prediction error: " + str(e))
             st.write(traceback.format_exc())
             st.stop()
 
-    # build display_preds: convert ids to names and normalize conf
+    # Build display_preds: (name, conf_normalized, id)
     display_preds = []
-    for cid, conf in preds:
-        try:
-            cfloat = float(conf)
-        except:
-            cfloat = 0.0
-        # If conf looks >1 assume percent
-        if cfloat > 1.0:
-            cfloat = cfloat / 100.0
-        name = CLASS_MAPPING.get(cid, f"Class {cid}")
-        display_preds.append((name, cfloat, int(cid)))
+    for cid, conf in preds_raw:
+        nconf = normalize_conf(conf)
+        name = CLASS_MAPPING.get(int(cid), f"Class {cid}")
+        display_preds.append((name, nconf, int(cid)))
 
-    # fallback: if no preds but r.probs exists try to use top1
+    # fallback: try r.probs top1 if nothing found
     if not display_preds:
         try:
-            if hasattr(r, "probs") and hasattr(r.probs, "top1conf") and hasattr(r.probs, "top1"):
-                rawc = float(r.probs.top1conf)
-                if rawc > 1.0: rawc = rawc / 100.0
+            if hasattr(r, "probs") and hasattr(r.probs, "top1") and hasattr(r.probs, "top1conf"):
                 tid = int(r.probs.top1)
-                display_preds = [(CLASS_MAPPING.get(tid, f"Class {tid}"), rawc, tid)]
+                rc = float(r.probs.top1conf)
+                rc = normalize_conf(rc)
+                display_preds = [(CLASS_MAPPING.get(tid, f"Class {tid}"), rc, tid)]
         except Exception:
             pass
 
-    # ---------- Visual layout with crop-only guard ----------
-    col1, col2 = st.columns([1.3, 1])
+    # Layout: image left, prediction right
+    col1, col2 = st.columns([1.4, 1])
     with col1:
         st.markdown('<div class="card">', unsafe_allow_html=True)
         st.image(pil, use_container_width=True)
@@ -273,51 +300,60 @@ if uploaded:
 
     with col2:
         st.markdown('<div class="card">', unsafe_allow_html=True)
-
-        top_name, top_conf, top_id = "Unknown", 0.0, None
+        top_name, top_conf, top_id = ("Unknown", 0.0, None)
         if display_preds:
             top_name, top_conf, top_id = display_preds[0]
 
-        # Gate: must be known crop class and confidence >= threshold
+        # Crop-only guard
+        name_crop_flag = is_crop_name(top_name)
         valid_class = (top_id in CLASS_MAPPING)
-        if top_conf >= CONF_THRESHOLD and valid_class:
+        confident = (top_conf >= CONF_THRESHOLD)
+
+        if confident and valid_class and name_crop_flag:
+            # accepted prediction
             st.markdown(f"#### 🔎 **Prediction:** {top_name}")
-            st.markdown(f"**Confidence:** {int(top_conf*100)}%")
+            st.markdown(f"**Confidence:** {int(top_conf * 100)}%")
             st.markdown(f'<div class="conf-bar"><div class="conf-fill" style="width:{int(top_conf*100)}%"></div></div>', unsafe_allow_html=True)
             st.markdown('---')
 
-            # Remedies from YAML (REMEDIES_FULL) prefered
-            entry = REMEDIES_FULL.get(top_id)
+            entry = REMEDIES_FULL.get(top_id, None)
             if entry:
-                remedy_short = entry.get("summary", "")
-                remedy_detailed = entry.get("details", "")
+                summary = entry.get("summary", "")
+                details = entry.get("details", "")
                 st.markdown("#### 🌱 **Recommended Action**")
-                st.write(remedy_short)
+                st.write(summary)
                 with st.expander("Read detailed guidance"):
-                    st.markdown(remedy_detailed.replace("\n", "  \n"))
+                    st.markdown(details.replace("\n", "  \n"))
             else:
                 st.markdown("#### 🌱 **Recommended Action**")
-                st.write(BUILTIN_REMEDIES.get(top_id, "No remedy available."))
-            st.caption("Remedies are guidance — consult local extension for chemicals & dosages.")
-            # allow download summary
-            rep = f"Plant Sight result\nTop prediction: {top_name} ({top_conf:.2f})\nRemedy: {(entry.get('summary') if entry else BUILTIN_REMEDIES.get(top_id,''))}\n"
+                st.write(BUILTIN_REMEDIES_SHORT.get(top_id, "General guidance — consult local extension."))
+
+            st.caption("Remedies are guidance only — consult local extension for chemicals & dosages.")
+            # Downloadable summary
+            rep = f"Plant Sight result\nTop prediction: {top_name} ({top_conf:.2f})\nRemedy: {(entry.get('summary') if entry else BUILTIN_REMEDIES_SHORT.get(top_id,''))}\n"
             st.download_button("📥 Download summary (.txt)", rep, file_name="plantsight_result.txt", use_container_width=True)
         else:
-            # reject: save rejected image for analysis
+            # reject - not confident or not crop-like
             reason = "not_crop_or_low_conf"
             saved = None
             if uploaded_bytes:
                 saved = save_rejected_upload(uploaded_bytes, reason=reason)
             st.markdown("#### ⚠️ **No valid crop prediction**")
-            st.error("This app is only designed for crop disease detection. Please upload a clear crop/leaf/stem image.")
-            st.markdown('<div class="small">Tips: crop the disease patch, avoid humans/animals/objects, use good lighting and close-up photos.</div>', unsafe_allow_html=True)
+            if not confident:
+                st.error("Model confidence is low. Try a clearer close-up, better lighting, or crop the diseased area.")
+            elif not name_crop_flag:
+                st.error("This image does not look like a crop part. Please upload a leaf, stem, boll, or ear photo.")
+            else:
+                st.error("No valid prediction — try another image.")
+            st.markdown('<div class="small">Tips: crop the disease patch, avoid humans/animals/food/objects, use natural light and fill the frame with the affected area.</div>', unsafe_allow_html=True)
             if saved:
                 st.markdown(f'<div class="small">Image saved for review: <code>{saved}</code></div>', unsafe_allow_html=True)
 
         st.markdown('</div>', unsafe_allow_html=True)
 
-    # always allow image download
+    # Always allow image download
     st.download_button("🖼️ Download image", image_bytes(pil), file_name="input.png", use_container_width=True)
 
+# End container/footer
 st.markdown('</div>', unsafe_allow_html=True)
 st.markdown('<div class="footer">Plant Sight • Fast disease ID • Guidance only — consult local extension for chemicals & dosages</div>', unsafe_allow_html=True)
