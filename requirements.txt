@@ -4,3 +4,7 @@ torch==2.8.0
 torchvision==0.23.0
 numpy
 pillow
+libgl1-mesa-glx
+libglib2.0-0
+python-3.11
+
