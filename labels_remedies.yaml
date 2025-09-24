@@ -1,134 +1,767 @@
 # labels_remedies.yaml
-classes:
-  0:
-    name: "American Bollworm on Cotton"
-    remedy: "Monitor bolls, remove damaged bolls, use pheromone traps/targeted insecticide and Bt varieties; rotate crops."
-  1:
-    name: "Anthracnose on Cotton"
-    remedy: "Remove infected debris, increase air circulation, apply appropriate fungicide and use resistant varieties."
-  2:
-    name: "Army worm"
-    remedy: "Handpick or use biocontrols/targeted insecticides; maintain healthy crop borders and timely scouting."
-  3:
-    name: "Bacterial Blight in cotton"
-    remedy: "Remove infected plant parts, avoid overhead irrigation, improve drainage; use approved bactericides."
-  4:
-    name: "Becterial Blight in Rice"
-    remedy: "Use clean seed, balanced fertilizer, flood/dry management and registered bactericides; follow local extension advice."
-  5:
-    name: "Brownspot"
-    remedy: "Use resistant varieties, balanced nutrients and foliar fungicides if needed; avoid prolonged leaf wetness."
-  6:
-    name: "Common_Rust"
-    remedy: "Remove alternate hosts, use rust-resistant varieties and fungicide sprays timed to infection risk."
-  7:
-    name: "Cotton Aphid"
-    remedy: "Use neem/soap sprays or biological controls; conserve predators (ladybugs); avoid excess nitrogen."
-  8:
-    name: "Flag Smut"
-    remedy: "Use certified seed, seed treatment and crop rotation; follow local fungicide recommendations."
-  9:
-    name: "Gray_Leaf_Spot"
-    remedy: "Remove infected leaves, improve airflow, apply fungicide when needed and avoid overhead watering."
-  10:
-    name: "Healthy Maize"
-    remedy: "No disease detected — maintain good agronomic practices and regular scouting."
-  11:
-    name: "Healthy Wheat"
-    remedy: "Healthy — keep crop rotation, timely fungicide if risk appears, and good nutrition."
-  12:
-    name: "Healthy cotton"
-    remedy: "Healthy — continue best-practices: balanced irrigation, nutrition and monitoring."
-  13:
-    name: "Leaf Curl"
-    remedy: "Prune affected parts, use resistant varieties, remove heavily infested plants and use vector control."
-  14:
-    name: "Leaf smut"
-    remedy: "Use resistant varieties, seed treatment and fungicide where recommended; improve field hygiene."
-  15:
-    name: "Mosaic sugarcane"
-    remedy: "Remove infected stools, use resistant varieties, maintain balanced nutrition and follow extension guidance."
-  16:
-    name: "RedRot sugarcane"
-    remedy: "Sanitation, remove infected canes, use resistant varieties and follow recommended fungicide schedule."
-  17:
-    name: "RedRust sugarcane"
-    remedy: "Use resistant varieties, cultural sanitation, and fungicides as per local advice."
-  18:
-    name: "Rice Blast"
-    remedy: "Use resistant varieties, proper spacing, timely fungicide and water management; remove infected plants."
-  19:
-    name: "Sugarcane Healthy"
-    remedy: "Healthy — maintain good field hygiene, nutrition and pest monitoring."
-  20:
-    name: "Tungro"
-    remedy: "Viral disease — remove infected plants, control vectors (insects), use resistant varieties and healthy seed."
-  21:
-    name: "Wheat Brown leaf Rust"
-    remedy: "Remove infected debris, apply rust control measures and use resistant varieties."
-  22:
-    name: "Wheat Brown leaf rust"
-    remedy: "See entry 21 — sanitation, resistant varieties and fungicide where applicable."
-  23:
-    name: "Wheat Stem fly"
-    remedy: "Early sowing, remove residues, use tolerant varieties and insecticide seed treatment if recommended."
-  24:
-    name: "Wheat aphid"
-    remedy: "Monitor, release/encourage natural enemies, use targeted insecticides only if threshold exceeded."
-  25:
-    name: "Wheat black rust"
-    remedy: "Plant resistant varieties, monitor and apply fungicide at key growth stages."
-  26:
-    name: "Wheat leaf blight"
-    remedy: "Crop rotation, avoid dense stands, treat with fungicide when needed."
-  27:
-    name: "Wheat mite"
-    remedy: "Use miticides or oils, conserve predators and avoid excessive use of broad-spectrum insecticides."
-  28:
-    name: "Wheat powdery mildew"
-    remedy: "Improve airflow, timely fungicides and grow resistant varieties."
-  29:
-    name: "Wheat scab"
-    remedy: "Crop rotation, resistant varieties, and fungicide seed treatment where advised."
-  30:
-    name: "Wheat___Yellow_Rust"
-    remedy: "Plant resistant varieties, monitor and apply fungicide at early signs."
-  31:
-    name: "Wilt"
-    remedy: "Diagnose (fungal/bacterial/physiological), use resistant varieties and improve drainage; remove infected plants."
-  32:
-    name: "Yellow Rust Sugarcane"
-    remedy: "Use resistant varieties, fungicide sprays and sanitation."
-  33:
-    name: "bacterial_blight in Cotton"
-    remedy: "Remove infected material, control vectors, and use clean seed/approved treatments."
-  34:
-    name: "bollrot on Cotton"
-    remedy: "Improve air flow, avoid late-season wetness, timely insect control to prevent fruit damage."
-  35:
-    name: "bollworm on Cotton"
-    remedy: "Monitor, use pheromone traps/Bt or targeted insecticides and timely scouting."
-  36:
-    name: "cotton mealy bug"
-    remedy: "Release natural enemies, use insecticidal soaps/oils and remove heavily infested plants."
-  37:
-    name: "cotton whitefly"
-    remedy: "Use yellow sticky traps, natural enemies, and insecticidal soaps or targeted sprays if needed."
-  38:
-    name: "maize ear rot"
-    remedy: "Manage moisture at harvest, use resistant hybrids and proper storage."
-  39:
-    name: "maize fall armyworm"
-    remedy: "Early detection, biopesticides (Bt), targeted insecticides and field sanitation."
-  40:
-    name: "maize stem borer"
-    remedy: "Use pheromone traps, resistant varieties and stem borer management practices."
-  41:
-    name: "pink bollworm in cotton"
-    remedy: "Pheromone traps, cultural controls and timely insecticide targeting larvae."
-  42:
-    name: "red cotton bug"
-    remedy: "Hand-pick high populations, use insecticide when threshold crossed and field sanitation."
-  43:
-    name: "thirps on  cotton"
-    remedy: "Monitor, use reflective mulch, conserve predators and apply insecticidal soap/targeted insecticide if needed."
+# Format: id:
+#   name: human-readable name
+#   summary: 1-line short remedy (for quick UI)
+#   details: |
+#     multi-line detailed guidance: symptoms, cultural, biological, chemical, monitoring, notes
+
+0:
+  name: "American Bollworm on Cotton"
+  summary: "Sanitation, pheromone traps, Bt/resistant varieties, targeted insecticides if threshold exceeded."
+  details: |
+    Symptoms:
+      - Larvae bore into bolls; holes, frass, premature boll drop; damaged seeds.
+    Cultural controls:
+      - Remove and destroy infested bolls and crop residues after harvest.
+      - Crop rotation and timely planting to avoid peak pest periods.
+      - Maintain field hygiene; remove alternate host weeds.
+    Biological controls:
+      - Encourage natural enemies (Trichogramma, parasitoids, predators).
+      - Use Bacillus thuringiensis (Bt) formulations where registered.
+    Chemical controls:
+      - Use targeted insecticides only on scouting-based thresholds; apply at egg/early larval stages.
+      - Prefer selective products and rotate modes of action to avoid resistance.
+      - Follow label instructions for dose, timing, PPE and pre-harvest intervals.
+    Monitoring:
+      - Use pheromone traps to track adult flight and time control measures.
+      - Regularly scout bolls for eggs/larvae; treat when economic thresholds exceeded.
+    Notes:
+      - Integrate cultural + biological methods to reduce chemical dependence.
+
+1:
+  name: "Anthracnose on Cotton"
+  summary: "Improve drainage, remove infected debris, apply registered fungicides and use resistant varieties."
+  details: |
+    Symptoms:
+      - Dark sunken lesions on leaves, stems and bolls; cankers on stems; premature defoliation.
+    Cultural controls:
+      - Remove and destroy infected plant debris and volunteers.
+      - Avoid overhead irrigation; improve air movement by balanced spacing.
+      - Use disease-free seed and resistant cultivars where available.
+    Biological controls:
+      - Maintain soil health and beneficial microflora via organic matter and composts.
+    Chemical controls:
+      - Apply registered fungicides (protectant and/or systemic) timed at early disease signs and high risk periods.
+      - Follow label rates and re-entry/PHI intervals.
+    Monitoring:
+      - Scout after humid/rainy spells; anthracnose favours warm, wet conditions.
+    Notes:
+      - Sanitation and variety choice reduce fungicide needs.
+
+2:
+  name: "Army worm"
+  summary: "Early scouting, handpick/biocontrols and selective insecticides at threshold; preserve natural enemies."
+  details: |
+    Symptoms:
+      - Defoliation in bands; chewed leaves; larvae often feed at night.
+    Cultural controls:
+      - Early mowing or burning of residues (if safe/allowed) to remove shelter.
+      - Maintain healthy crop vigour through balanced nutrition.
+    Biological controls:
+      - Encourage predators (birds, parasitic wasps) and use NPV (nucleopolyhedrovirus) or Bt where registered.
+    Chemical controls:
+      - Use selective insecticides when scouting indicates threshold; target younger larvae for best control.
+    Monitoring:
+      - Night scouting and light traps help detect adult moth flights.
+    Notes:
+      - Coordinate area-wide management to prevent re-infestation.
+
+3:
+  name: "Bacterial Blight in cotton"
+  summary: "Use disease-free seed, sanitation, avoid overhead irrigation, and apply recommended bactericides where available."
+  details: |
+    Symptoms:
+      - Water-soaked lesions, angular leaf spots, defoliation, and infected bolls with streaks.
+    Cultural controls:
+      - Plant certified disease-free seed; rotate crops; remove infected plants and debris.
+      - Avoid overhead irrigation; use drip or furrow irrigation to reduce splash.
+    Biological controls:
+      - Promote beneficial microbes with good soil management; use seed treatments that reduce seed-borne bacteria.
+    Chemical controls:
+      - Apply copper-based bactericides only where registered and when disease pressure is high; maintain label guidance.
+    Monitoring:
+      - Scout during warm, humid weather and after heavy rains when spread is likely.
+    Notes:
+      - For bacterial diseases, sanitation and seed health are most effective.
+
+4:
+  name: "Becterial Blight in Rice"
+  summary: "Use resistant varieties, seed treatment, good water management, and apply approved bactericides if necessary."
+  details: |
+    Symptoms:
+      - Water-soaked streaks on leaves, yellowing, and sometimes seedling blight.
+    Cultural controls:
+      - Use resistant/tolerant varieties; ensure healthy nursery operations and seed treatment.
+      - Good water and nutrient management; avoid prolonged leaf wetness.
+    Biological controls:
+      - Maintain beneficial rhizosphere microbes through organic inputs.
+    Chemical controls:
+      - Apply copper-based products or registered bactericides under advisement of extension; observe label rules.
+    Monitoring:
+      - Regularly inspect nurseries and fields during warm, humid conditions.
+    Notes:
+      - Seek local extension guidance on suitable varietal and chemical options.
+
+5:
+  name: "Brownspot"
+  summary: "Use resistant varieties, crop rotation, balanced fertilizers and fungicide sprays when needed."
+  details: |
+    Symptoms:
+      - Brown circular spots on leaves, often surrounded by yellow halos; can reduce photosynthesis.
+    Cultural controls:
+      - Rotate crops, remove infected debris, avoid excess nitrogen which favors severity.
+      - Improve field drainage and spacing for better airflow.
+    Biological controls:
+      - Encourage antagonistic fungi and bacteria via organic matter and reduced chemical disturbance.
+    Chemical controls:
+      - Apply foliar fungicides recommended for the crop/disease at early sign or according to disease risk models.
+      - Use registered products and follow label intervals.
+    Monitoring:
+      - Scout during humid weather; treat when lesions spread rapidly.
+    Notes:
+      - Balanced nutrition reduces host susceptibility.
+
+6:
+  name: "Common_Rust"
+  summary: "Use rust-resistant varieties, timely fungicide sprays, and remove alternate hosts."
+  details: |
+    Symptoms:
+      - Reddish-brown pustules on leaves; defoliation in severe infections; lower yields.
+    Cultural controls:
+      - Plant resistant cultivars; remove volunteer plants and alternate hosts.
+      - Ensure crop rotations and good field drainage.
+    Biological controls:
+      - Maintain biodiversity to support natural antagonists.
+    Chemical controls:
+      - Use systemic and protectant fungicides as per extension recommendations; apply at early rust onset.
+    Monitoring:
+      - Monitor for pustules during warm, humid weather; treat before epidemic spread.
+    Notes:
+      - Fungicide timing crucial — apply at first signs or protectively in high-risk seasons.
+
+7:
+  name: "Cotton Aphid"
+  summary: "Promote predators, use insecticidal soap/neem, and apply selective insecticides only above thresholds."
+  details: |
+    Symptoms:
+      - Clusters of small pear-shaped aphids on underside of leaves, sticky honeydew and sooty mold.
+    Cultural controls:
+      - Avoid excessive nitrogen; encourage beneficial insects by reduced broad-spectrum insecticide use.
+    Biological controls:
+      - Release or conserve lady beetles, lacewings, parasitic wasps.
+      - Use entomopathogenic fungi in appropriate conditions.
+    Chemical controls:
+      - If threshold reached, use selective insecticides or insecticidal soap/oil sprays; follow label instructions.
+    Monitoring:
+      - Scout leaf underside and terminals regularly; watch for honeydew/sooty mold as signs of heavy infestation.
+    Notes:
+      - Overuse of insecticides can flare aphids by killing natural enemies.
+
+8:
+  name: "Flag Smut"
+  summary: "Use clean seed, seed treatment, crop rotation and resistant varieties where available."
+  details: |
+    Symptoms:
+      - Black stripes on emerging shoots, stunting, and leaf symptoms may appear later.
+    Cultural controls:
+      - Use certified seed and rotate with non-host crops; deep ploughing may help reduce inoculum.
+      - Avoid sowing in infected fields without management.
+    Biological controls:
+      - Seed treatments with biological protectants can reduce early disease.
+    Chemical controls:
+      - Use recommended seed treatment fungicides as per local regulations.
+    Monitoring:
+      - Inspect seedlings in early growth for blackening or flag symptoms.
+    Notes:
+      - Prevention at sowing (seed health) is most effective.
+
+9:
+  name: "Gray_Leaf_Spot"
+  summary: "Rotate crops, use resistant hybrids/varieties, timely foliar fungicides and residue management."
+  details: |
+    Symptoms:
+      - Rectangular lesions often between leaf veins; severe cases cause premature leaf death.
+    Cultural controls:
+      - Remove/bury crop residues that host pathogen; rotate away from susceptible hosts.
+      - Use balanced fertilization to reduce stress.
+    Biological controls:
+      - No reliable large-scale bio-control; promote overall field health.
+    Chemical controls:
+      - Apply recommended fungicides at disease onset or under high-risk conditions; follow label guidelines.
+    Monitoring:
+      - Scout during warm, humid periods; use disease forecasting where available.
+    Notes:
+      - Combined residue management + timely sprays gives best control.
+
+10:
+  name: "Healthy Maize"
+  summary: "No disease detected — maintain good agronomy and regular scouting."
+  details: |
+    Symptoms:
+      - No visible disease symptoms.
+    Cultural controls:
+      - Continue crop rotation, balanced nutrition, proper irrigation and sanitation.
+    Biological controls:
+      - Encourage beneficial insects and soil health.
+    Chemical controls:
+      - No chemical action required; use prophylactic measures only if risk warrants.
+    Monitoring:
+      - Continue scouting to detect any early changes.
+    Notes:
+      - Healthy fields are easiest and cheapest to manage.
+
+11:
+  name: "Healthy Wheat"
+  summary: "Crop practices: rotate, monitor, nutrient balance; no treatment required if healthy."
+  details: |
+    Symptoms:
+      - No obvious pathogen signs.
+    Cultural controls:
+      - Maintain recommended sowing rates, balanced fertilization, and weed control.
+    Biological controls:
+      - Conserve natural enemies and soil microorganisms.
+    Chemical controls:
+      - None necessary; apply fungicides/insecticides only if scouting indicates.
+    Monitoring:
+      - Regular scouting and record-keeping to maintain health status.
+    Notes:
+      - Keep seed and field hygiene to prevent outbreaks.
+
+12:
+  name: "Healthy cotton"
+  summary: "Maintain best agronomy practices and regular scouting."
+  details: |
+    Symptoms:
+      - No disease signs or pest damage.
+    Cultural controls:
+      - Rotate crops, manage irrigation and nutrients, remove volunteers.
+    Biological controls:
+      - Support natural enemy populations.
+    Chemical controls:
+      - None required; act only on threshold-based scouting.
+    Monitoring:
+      - Continue periodic inspections to catch issues early.
+    Notes:
+      - Prevention is cheaper than cure.
+
+13:
+  name: "Leaf Curl"
+  summary: "Remove infected plants, control whitefly vectors, use resistant varieties and healthy planting material."
+  details: |
+    Symptoms:
+      - Curling, puckering and yellowing of leaves; stunted growth; often transmitted by whiteflies (vector-borne).
+    Cultural controls:
+      - Remove and destroy heavily infected plants to reduce inoculum.
+      - Use certified virus-free planting material and resistant varieties where available.
+    Biological controls:
+      - Conserve predators of whitefly; use reflective mulches to reduce settling.
+    Chemical controls:
+      - Control whitefly vectors with selective insecticides only if populations exceed thresholds.
+    Monitoring:
+      - Monitor vector populations (yellow sticky traps) and leaf symptoms; early vector control reduces spread.
+    Notes:
+      - Viral diseases respond poorly to chemicals — focus on vector control and resistant varieties.
+
+14:
+  name: "Leaf smut"
+  summary: "Use clean seed, seed treatments, crop rotation and fungicides where recommended."
+  details: |
+    Symptoms:
+      - Smut sori or dark spores on leaf surfaces; reduced leaf function.
+    Cultural controls:
+      - Use healthy seed and rotate crops to non-hosts.
+      - Remove infected debris after harvest.
+    Biological controls:
+      - Promote soil health with organic amendments.
+    Chemical controls:
+      - Use registered seed treatments or foliar fungicides at recommended timings.
+    Monitoring:
+      - Check seedlings and young leaves under humid conditions.
+    Notes:
+      - Seed health and field hygiene are key.
+
+15:
+  name: "Mosaic sugarcane"
+  summary: "Rogue infected plants, control vectors, use resistant varieties and clean planting material."
+  details: |
+    Symptoms:
+      - Mosaic or mottling on leaves, stunted growth, reduced cane weight.
+    Cultural controls:
+      - Use virus-free planting material; remove infected stools; sanitize tools.
+    Biological controls:
+      - Manage insect vectors (planthoppers, aphids) through natural enemies.
+    Chemical controls:
+      - Control vectors with targeted insecticides only if needed and follow label.
+    Monitoring:
+      - Inspect nurseries and planting fields for mosaic symptoms.
+    Notes:
+      - Viral control focuses on clean planting material and vector management.
+
+16:
+  name: "RedRot sugarcane"
+  summary: "Use resistant varieties, sanitation, fungicide-treated setts and remove infected stools."
+  details: |
+    Symptoms:
+      - Reddish discoloration inside stalks, wilting, white or orange fungal growth in advanced stages.
+    Cultural controls:
+      - Use resistant varieties, destroy infected stools, avoid replanting in heavily infected fields.
+      - Plant healthy setts and maintain good drainage.
+    Biological controls:
+      - Limited effective biological controls; focus on resistant varieties.
+    Chemical controls:
+      - Apply approved fungicidal treatments to setts where recommended by extension.
+    Monitoring:
+      - Inspect for internal reddening at harvest; remove infected material promptly.
+    Notes:
+      - Sanitation and variety choice are central to management.
+
+17:
+  name: "RedRust sugarcane"
+  summary: "Plant resistant varieties, timely fungicide sprays, and remove infected leaves."
+  details: |
+    Symptoms:
+      - Orange-red pustules on leaves; heavy infections reduce photosynthesis and yield.
+    Cultural controls:
+      - Grow resistant varieties and avoid dense planting; remove heavily infected leaves.
+    Biological controls:
+      - Promote beneficial organisms in the field environment.
+    Chemical controls:
+      - Use recommended fungicides when disease is present or predicted by risk models.
+    Monitoring:
+      - Monitor during humid/wet spells when rust thrives.
+    Notes:
+      - Coordinate sprays according to growth stage and disease pressure.
+
+18:
+  name: "Rice Blast"
+  summary: "Use resistant varieties, manage water/nitrogen, and apply timely fungicide where needed."
+  details: |
+    Symptoms:
+      - Diamond-shaped lesions on leaves, neck rot on panicles causing severe yield loss.
+    Cultural controls:
+      - Use resistant varieties, avoid excessive nitrogen, manage irrigation (avoid over-saturation).
+      - Practice good residue management.
+    Biological controls:
+      - Promote beneficial microorganisms and maintain field hygiene.
+    Chemical controls:
+      - Apply fungicides protectively or at early symptom appearance as recommended.
+    Monitoring:
+      - Scout nursery and main field during warm, humid weather; treat neck blast early to prevent yield loss.
+    Notes:
+      - Variety choice and nutrient/water management are highly effective.
+
+19:
+  name: "Sugarcane Healthy"
+  summary: "Maintain nutrient balance, sanitation and monitor for pests/diseases."
+  details: |
+    Symptoms:
+      - No visible disease signs.
+    Cultural controls:
+      - Balanced fertilization, weed control, and remove volunteers.
+    Biological controls:
+      - Preserve beneficial fauna and soil life via minimal tillage and organic matter.
+    Chemical controls:
+      - None required unless monitoring indicates a problem.
+    Monitoring:
+      - Regular scouting at growth milestones.
+    Notes:
+      - Preventive measures keep yields stable.
+
+20:
+  name: "Tungro"
+  summary: "Use virus-free seedlings, control vector (leafhopper), and rogue infected plants early."
+  details: |
+    Symptoms:
+      - Stunted plants, yellow-orange leaf discoloration; reduced tillering.
+    Cultural controls:
+      - Use certified seed; proper spacing; remove infected plants immediately.
+    Biological controls:
+      - Manage leafhopper vectors by conserving natural enemies.
+    Chemical controls:
+      - If leafhopper populations exceed threshold, use targeted insecticides with care.
+    Monitoring:
+      - Monitor vector populations using light traps; scout for discolored plants.
+    Notes:
+      - Prevention (seed health + vector control) is more effective than treatment.
+
+21:
+  name: "Wheat Brown leaf Rust"
+  summary: "Grow resistant varieties, timely fungicide application and crop rotation."
+  details: |
+    Symptoms:
+      - Brown pustules on leaves; reduced grain filling in severe cases.
+    Cultural controls:
+      - Plant resistant varieties; rotate crops and remove volunteer grasses.
+    Biological controls:
+      - Encourage biodiversity; limited direct bio-control options.
+    Chemical controls:
+      - Apply fungicides at early infection stages or when weather forecasts predict rust pressure.
+    Monitoring:
+      - Scout during warm, moist periods; monitor weather and growth stage.
+    Notes:
+      - Timely action saves yield.
+
+22:
+  name: "Wheat Brown leaf rust (duplicate)"
+  summary: "Same as Wheat Brown leaf Rust — use resistant varieties and fungicide timing."
+  details: |
+    # duplicate entry: same guidance as id 21
+    See: id 21.
+
+23:
+  name: "Wheat Stem fly"
+  summary: "Early sowing, residue management and seed treatments to protect seedlings."
+  details: |
+    Symptoms:
+      - Dead hearts in seedlings, tunneling in stems, reduced tillering.
+    Cultural controls:
+      - Early sowing to avoid peak fly activity; remove crop residues; deep ploughing if advised.
+      - Use tolerant varieties and balanced nutrition.
+    Biological controls:
+      - Encourage natural enemies (parasitoids); use entomopathogenic nematodes where appropriate.
+    Chemical controls:
+      - Use registered seed treatments and targeted foliar insecticides if thresholds reached.
+    Monitoring:
+      - Monitor for adult flies and seedling damage in early crop stages.
+    Notes:
+      - Protect seedlings; seed treatments are often most effective.
+
+24:
+  name: "Wheat aphid"
+  summary: "Monitor, conserve predators, and apply insecticides only when thresholds are exceeded."
+  details: |
+    Symptoms:
+      - Plant sap-sucking signs, honeydew, transmission of barley yellow dwarf virus (BYDV).
+    Cultural controls:
+      - Delay sowing where feasible; control volunteer cereals and weeds which host aphids.
+    Biological controls:
+      - Conserve ladybirds, lacewings and parasitoids; use banker plants if applicable.
+    Chemical controls:
+      - Use selective insecticides only when monitoring indicates population above economic thresholds.
+    Monitoring:
+      - Regularly sample sentinel plants, check for virus symptoms and vector presence.
+    Notes:
+      - Vector management is important to reduce virus incidence.
+
+25:
+  name: "Wheat black rust"
+  summary: "Use rust-resistant varieties, sanitation and timely fungicide sprays at critical stages."
+  details: |
+    Symptoms:
+      - Dark black uredinia on leaves/stems; heavy infections reduce quality and yield.
+    Cultural controls:
+      - Plant resistant cultivars, remove volunteer hosts, and rotate crops.
+    Biological controls:
+      - Maintain beneficial organisms and avoid unnecessary fungicide that may harm them.
+    Chemical controls:
+      - Apply fungicides with recommended modes of action and rotate products to avoid resistance.
+    Monitoring:
+      - Frequent scouting during rust-favourable conditions.
+    Notes:
+      - Use integrated resistance + fungicide strategy.
+
+26:
+  name: "Wheat leaf blight"
+  summary: "Rotate crops, use disease-free seed, and apply fungicides at first signs if spread rapid."
+  details: |
+    Symptoms:
+      - Irregular lesions on leaves; can co-occur with other foliar diseases.
+    Cultural controls:
+      - Crop rotation, avoid excessive nitrogen which exacerbates leaf diseases.
+    Biological controls:
+      - Use soil health practices to sustain antagonists.
+    Chemical controls:
+      - Use registered foliar fungicides when disease is increasing rapidly.
+    Monitoring:
+      - Monitor early season and after wet weather events.
+    Notes:
+      - Integrated management provides most durable control.
+
+27:
+  name: "Wheat mite"
+  summary: "Use acaricides when threshold reached; conserve predators and reduce dust/stress."
+  details: |
+    Symptoms:
+      - Tiny mites causing stippling, bronzing or reduced vigor on leaves.
+    Cultural controls:
+      - Reduce plant stress (balanced irrigation/nutrition); avoid dusty conditions that favour mites.
+    Biological controls:
+      - Promote predatory mites and insectivores.
+    Chemical controls:
+      - Apply registered acaricides only when monitoring indicates economic damage.
+    Monitoring:
+      - Use leaf brushing or beat tray sampling to estimate mite numbers.
+    Notes:
+      - Overuse of broad-spectrum insecticides can flare mites by removing predators.
+
+28:
+  name: "Wheat powdery mildew"
+  summary: "Grow resistant varieties, improve air circulation, and apply fungicides at early signs."
+  details: |
+    Symptoms:
+      - White powdery patches on leaf surfaces; reduced photosynthesis.
+    Cultural controls:
+      - Improve canopy airflow via spacing; avoid high N levels that increase susceptibility.
+    Biological controls:
+      - Use antagonistic microbial products where available.
+    Chemical controls:
+      - Apply protectant/systemic fungicides according to thresholds and label instructions.
+    Monitoring:
+      - Scout frequently in cool, humid weather; early sprays limit spread.
+    Notes:
+      - Resistant varieties reduce dependence on sprays.
+
+29:
+  name: "Wheat scab"
+  summary: "Use tolerant varieties, crop rotation, residue management and fungicide at flowering if risk."
+  details: |
+    Symptoms:
+      - Bleached spikelets, shriveled/grain contaminated with mycotoxins (Fusarium).
+    Cultural controls:
+      - Rotate away from maize, bury residues, use well-timed planting to avoid high-risk weather during flowering.
+    Biological controls:
+      - Biological seed treatments may reduce seedling infection.
+    Chemical controls:
+      - Fungicide at flowering may reduce severity; timing critical — follow local advice.
+    Monitoring:
+      - Monitor weather and flowering stage; test grain for mycotoxins if scab was present.
+    Notes:
+      - Grain safety (mycotoxins) is a major concern — follow extension protocols.
+
+30:
+  name: "Wheat___Yellow_Rust"
+  summary: "Use resistant varieties, monitor and apply fungicides at early infection."
+  details: |
+    Symptoms:
+      - Yellow/orange pustules on leaf surface; rapid spread under cool, moist conditions.
+    Cultural controls:
+      - Resistant cultivars and reduce volunteer hosts.
+    Biological controls:
+      - Maintain biodiversity; antagonists have limited direct effect on rusts.
+    Chemical controls:
+      - Timely systemic fungicides during early infection or protectively in high-risk seasons.
+    Monitoring:
+      - Watch weather forecasts and scout frequently.
+    Notes:
+      - Resistance durability varies; integrate methods.
+
+31:
+  name: "Wilt"
+  summary: "Identify cause (fungal/bacterial/nematode), use resistant varieties, soil health and sanitation."
+  details: |
+    Symptoms:
+      - Wilting of leaves, often one-sided, vascular browning in infected stems/roots.
+    Cultural controls:
+      - Rotate crops, solarize or treat soil if nematodes present, remove infected plants.
+    Biological controls:
+      - Use antagonistic soil microbes and organic amendments to improve resilience.
+    Chemical controls:
+      - Soil fumigants or nematicides only where registered and recommended; for fungal wilt, foliar fungicides are often ineffective.
+    Monitoring:
+      - Inspect roots for rot and vascular discoloration; conduct lab diagnosis to confirm pathogen.
+    Notes:
+      - Accurate diagnosis is essential before treatment.
+
+32:
+  name: "Yellow Rust Sugarcane"
+  summary: "Use resistant varieties, fungicide sprays and sanitation to lower inoculum."
+  details: |
+    Symptoms:
+      - Yellowish spindle-shaped pustules on leaf midribs and blades.
+    Cultural controls:
+      - Resistant cultivars, remove infected material, maintain balanced nutrition.
+    Biological controls:
+      - Encourage beneficial microflora and avoid unnecessary chemicals.
+    Chemical controls:
+      - Use approved fungicides in rotation when disease pressure is high.
+    Monitoring:
+      - Scout during warm, humid weather; apply preventative measures if forecasted risk high.
+    Notes:
+      - Local extension provides region-specific timing.
+
+33:
+  name: "bacterial_blight in Cotton"
+  summary: "Use clean seed, remove infected plants, control vectors and apply registered bactericides cautiously."
+  details: |
+    Symptoms:
+      - Water-soaked lesions on leaves, stem cankers, boll rot.
+    Cultural controls:
+      - Use certified seed, remove and destroy infected plants, avoid overhead irrigation.
+    Biological controls:
+      - Soil health practices and beneficial microbes help reduce susceptibility.
+    Chemical controls:
+      - Copper-based products may reduce spread under heavy pressure — follow local guidelines.
+    Monitoring:
+      - Inspect after rains and during warm conditions; bacterial diseases spread quickly by splash and vectors.
+    Notes:
+      - Consult local extension for approved bactericides and dosages.
+
+34:
+  name: "bollrot on Cotton"
+  summary: "Improve airflow, control insect pests that create entry points, and manage harvest/storage moisture."
+  details: |
+    Symptoms:
+      - Rotting of bolls, internal discoloration and secondary fungal/bacterial invasion.
+    Cultural controls:
+      - Timely harvest, avoid late-season wetness, and improve boll exposure to drying.
+    Biological controls:
+      - Manage soil and canopy health to reduce pathogen pressure.
+    Chemical controls:
+      - Control insects (bollworms) that damage bolls and predispose to rot; fungicide use depends on pathogen ID.
+    Monitoring:
+      - Inspect bolls during wet periods; reduce insect damage to prevent rot.
+    Notes:
+      - Primary prevention is insect + harvest management.
+
+35:
+  name: "bollworm on Cotton"
+  summary: "Use Bt/host resistance, pheromone traps, timely scouting and selective insecticides as needed."
+  details: |
+    Symptoms:
+      - Larvae feeding on bolls and squares causing bore holes and frass.
+    Cultural controls:
+      - Use Bt varieties, timely planting, and crop sanitation to remove larvae habitats.
+    Biological controls:
+      - Use Bacillus thuringiensis products and conserve parasitoids/predators.
+    Chemical controls:
+      - Use targeted insecticides at early larval stages; rotate modes of action.
+    Monitoring:
+      - Monitor with pheromone traps and regular boll inspections.
+    Notes:
+      - Integrated pest management avoids resistance build-up.
+
+36:
+  name: "cotton mealy bug"
+  summary: "Promote natural enemies, use soap/oil sprays and targeted insecticides if needed."
+  details: |
+    Symptoms:
+      - White waxy masses on stems/underside of leaves, honeydew and sooty mold.
+    Cultural controls:
+      - Remove heavily infested plant parts and maintain field sanitation.
+    Biological controls:
+      - Release or encourage ladybugs, lacewings and parasitoids; apply biological insecticides where available.
+    Chemical controls:
+      - Use insecticidal soaps, horticultural oils or selective insecticides as a last resort.
+    Monitoring:
+      - Inspect plant junctures and underside of leaves; treat early before populations explode.
+    Notes:
+      - Avoid broad-spectrum insecticides that remove predators.
+
+37:
+  name: "cotton whitefly"
+  summary: "Use yellow sticky traps, natural enemies, and selective insecticidal controls when threshold crossed."
+  details: |
+    Symptoms:
+      - Whiteflies on undersides of leaves, honeydew and sooty mold, stunting.
+    Cultural controls:
+      - Remove host weeds; maintain healthy crop nutrition and airflow.
+    Biological controls:
+      - Conserve and augment predators and parasitoids; apply entomopathogenic fungi in suitable conditions.
+    Chemical controls:
+      - Use selective insecticides or oils when monitoring thresholds are exceeded.
+    Monitoring:
+      - Use yellow sticky traps and leaf inspections to gauge populations.
+    Notes:
+      - Focus on preserving beneficials to avoid rapid rebounds.
+
+38:
+  name: "maize ear rot"
+  summary: "Harvest and dry promptly, use resistant hybrids and manage kernel moisture to prevent mold development."
+  details: |
+    Symptoms:
+      - Rotting of kernels in ear; discoloration, often associated with high moisture or insect damage.
+    Cultural controls:
+      - Timely harvest and proper drying; manage insect damage to ears; remove infected cobs.
+    Biological controls:
+      - Post-harvest biological control limited; focus on good storage practices.
+    Chemical controls:
+      - Fungicide seed treatments and field sprays as recommended for specific pathogens and under advisement.
+    Monitoring:
+      - Inspect ears at R stages; reduce moisture at harvest and during storage.
+    Notes:
+      - Grain quality and storage handling critical to prevent mycotoxin issues.
+
+39:
+  name: "maize fall armyworm"
+  summary: "Early detection, use biopesticides (Bt), targeted insecticides, and field sanitation."
+  details: |
+    Symptoms:
+      - Windowing of leaves, frass in whorl/ears, severe defoliation if unchecked.
+    Cultural controls:
+      - Early planting and field sanitation reduce outbreaks; remove alternate hosts.
+    Biological controls:
+      - Use parasitoids, predators and biopesticides (Bt, NPV) where effective.
+    Chemical controls:
+      - Apply selective insecticides targeting early larval stages; rotate modes of action to prevent resistance.
+    Monitoring:
+      - Use pheromone traps and regular scouting (whorl/ear checks).
+    Notes:
+      - Area-wide coordination improves control outcomes.
+
+40:
+  name: "maize stem borer"
+  summary: "Use pheromone traps, resistant hybrids, cultural practices and targeted insecticides."
+  details: |
+    Symptoms:
+      - Deadheart, tunneling inside stems, broken tassels and lodging.
+    Cultural controls:
+      - Remove and destroy stubbles and residues; timely planting and harvesting; intercropping reduces pressure.
+    Biological controls:
+      - Encourage parasitoids and predators; granular biocontrols may help in early stages.
+    Chemical controls:
+      - Use stem-applied or systemic insecticides where recommended and at the right crop stage.
+    Monitoring:
+      - Pheromone traps and scouting for larvae/pupal damage.
+    Notes:
+      - Integrated measures are most effective long-term.
+
+41:
+  name: "pink bollworm in cotton"
+  summary: "Use pheromone traps, Bt varieties, cultural sanitation and targeted chemicals if required."
+  details: |
+    Symptoms:
+      - Larvae bore into bolls; lint and seed damage; webbing inside bolls.
+    Cultural controls:
+      - Sanitation (destroy crop residues), crop rotation and avoid late-season host presence.
+    Biological controls:
+      - Release of natural enemies where feasible and Bt-based controls.
+    Chemical controls:
+      - Use pheromone disruption, targeted insecticides at early stages under threshold guidance.
+    Monitoring:
+      - Pheromone traps critical to detect adult flights and time interventions.
+    Notes:
+      - Area-wide integrated pest management effective.
+
+42:
+  name: "red cotton bug"
+  summary: "Hand-pick, improve field sanitation, and use insecticides if population high."
+  details: |
+    Symptoms:
+      - Feeding punctures on bolls, staining and fibre quality reduction.
+    Cultural controls:
+      - Remove weed hosts and infested residues; improve harvest timing to avoid peak populations.
+    Biological controls:
+      - Conserve predators; few commercial biocontrol options.
+    Chemical controls:
+      - Apply registered insecticides if thresholds exceeded; follow label directions.
+    Monitoring:
+      - Regular inspection of bolls; treat early to prevent quality loss.
+    Notes:
+      - Prevention and clean fields reduce risk.
+
+43:
+  name: "thirps on  cotton"
+  summary: "Monitor, conserve predators, use reflective mulches and selective control when needed."
+  details: |
+    Symptoms:
+      - Fine stippling, silvering and distortion of leaves; vector for viruses in some crops.
+    Cultural controls:
+      - Use reflective mulches, remove alternate hosts and manage weeds.
+    Biological controls:
+      - Encourage predatory mites and insects; use entomopathogens if available.
+    Chemical controls:
+      - Apply selective insecticides or oils when economic thresholds are exceeded.
+    Monitoring:
+      - Sticky traps and leaf inspections; sample regularly in early season.
+    Notes:
+      - Vector control reduces virus spread and long-term damage.
