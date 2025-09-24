@@ -1,6 +1,6 @@
 streamlit
-ultralytics
-torch
-torchvision
-pillow
+ultralytics==8.3.203
+torch==2.8.0
+torchvision==0.23.0
 numpy
+pillow
