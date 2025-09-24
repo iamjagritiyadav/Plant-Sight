@@ -5,11 +5,15 @@ from PIL import Image
 import numpy as np
 
 # Try to import ultralytics.YOLO lazily so app fails clearly if missing
+import subprocess
+import sys
+
+# Install ultralytics if not available
 try:
-    from ultralytics import YOLO
-except Exception as e:
-    YOLO = None
-    # We'll error later with a clear message
+    import ultralytics
+except ImportError:
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "ultralytics"])
+    import ultralytics
 
 # ---------------- Config ----------------
 MODEL_PATH = "best.pt"  # ensure this file exists next to app.py
@@ -426,4 +430,5 @@ if uploaded:
 
 
 st.markdown('</div>', unsafe_allow_html=True)
+
 st.markdown('<div class="footer">Plant Sight • Fast disease ID • Guidance only — consult local extension for chemicals & dosages</div>', unsafe_allow_html=True)
