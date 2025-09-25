@@ -1,53 +1,45 @@
-"""app.py — Plant Sight (rewritten)
-
-Streamlit app for crop disease detection using an Ultralytics YOLO model.
-This version is cleaned, typed, and production-friendly.
+# app.py — Plant Sight (complete, production-friendly)
+"""
+Plant Sight - Streamlit app for crop disease detection.
 
 Requirements (install at build time / in your environment):
-- streamlit
-- ultralytics
-- torch (if needed by your ultralytics build)
-- pillow
-- numpy
-- pyyaml
+  - streamlit
+  - ultralytics
+  - torch
+  - torchvision
+  - pillow
+  - numpy
+  - pyyaml
 
 Notes:
-- Avoids runtime pip installs; install dependencies at build time.
-- Use Streamlit Cloud's packages.txt / runtime.txt for system libs (libGL) and Python version.
-
-Place your trained model file (default: `best.pt`) and optional
-`labels_remedies.yaml` next to this file.
+ - This file intentionally avoids attempting long runtime pip installs.
+ - Use runtime.txt / packages.txt on Streamlit Cloud to ensure system libs (libGL) and Python version.
 """
 
-from __future__ import annotations
-
-import io
 import os
+import io
+import sys
 import base64
 import traceback
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Tuple
 
 import streamlit as st
+from PIL import Image
 import numpy as np
 import yaml
-from PIL import Image
 
-# ---------------------- Configuration ----------------------
-MODEL_PATH = os.environ.get("MODEL_PATH", "best.pt")
-LABELS_REMEDIES_YAML = os.environ.get("LABELS_REMEDIES_YAML", "labels_remedies.yaml")
+# ---------------- Config ----------------
+MODEL_PATH = "best.pt"          # place your trained model next to app.py
 TOP_K = 3
-CONF_THRESHOLD = 0.70  # require >= 0.70 confidence to accept prediction
+CONF_THRESHOLD = 0.70          # require >= 0.70 confidence to show prediction/remedy
 REJECTED_DIR = "rejected"
-CROP_KEYWORDS = ["cotton", "maize", "wheat", "rice", "sugarcane"]
-ALLOWED_EXTS = ("jpg", "jpeg", "png")
+CROP_KEYWORDS = ["cotton", "maize", "wheat", "rice", "sugarcane"]  # used to reject non-crop images
 
 os.makedirs(REJECTED_DIR, exist_ok=True)
 
-# ---------------------- UI / Styling ----------------------
+# ---------------- UI CSS ----------------
 st.set_page_config(page_title="Plant Sight", page_icon="🌿", layout="wide")
-
-CSS = r"""
+CSS = """<style>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap');
 :root{ --brand-green:#178f2d; --muted:#9aa4ad; }
 body { background: #071016; color: #E6EEF3; font-family: 'Poppins', sans-serif; }
@@ -65,164 +57,110 @@ body { background: #071016; color: #E6EEF3; font-family: 'Poppins', sans-serif; 
 .small { color:#9aa4ad; font-size:13px; }
 .footer { margin-top:30px; color:var(--muted); font-size:12px; text-align:center; }
 .stButton>button { background-color: #178f2d; color: white; font-weight: 600; border-radius: 8px; border: none; }
-@media (max-width: 768px) { .header { flex-direction: column; text-align:center; } .hero-title { font-size:24px; } }
-"""
-
+@media (max-width: 768px) {
+  .header { flex-direction: column; text-align:center; }
+  .hero-title { font-size:24px; }
+}
+</style>"""
 st.markdown(CSS, unsafe_allow_html=True)
 
-# ---------------------- Helpers ----------------------
-
-
-def find_logo_file() -> Optional[str]:
-    """Return first file in working dir whose name starts with 'logo' (case-insensitive)."""
+# ---------------- Helpers ----------------
+def find_logo_file():
     for fname in os.listdir("."):
         if fname.lower().startswith("logo") and os.path.isfile(fname):
             return fname
     return None
 
-
-def image_bytes(pil_img: Image.Image) -> bytes:
+def image_bytes(pil_img):
     buf = io.BytesIO()
     pil_img.save(buf, format="PNG")
     return buf.getvalue()
 
-
-def save_rejected_upload(uploaded_bytes: bytes, reason: str = "rejected") -> str:
+def save_rejected_upload(uploaded_bytes: bytes, reason: str = "rejected"):
     ts = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
     fname = os.path.join(REJECTED_DIR, f"{reason}_{ts}.png")
     try:
         with open(fname, "wb") as f:
             f.write(uploaded_bytes)
     except Exception:
-        # best-effort save — ignore failures
         pass
     return fname
 
-
-def normalize_conf(c: Any) -> float:
-    """Normalize confidence to [0.0, 1.0]. Accepts 0..1 or 0..100."""
+def normalize_conf(c):
+    """Return confidence as float in 0..1 space. Accepts 0..1 or 0..100."""
     try:
         f = float(c)
     except Exception:
         return 0.0
     if f > 1.0:
         f = f / 100.0
-    if f < 0:
-        return 0.0
-    return min(1.0, f)
+    if f < 0: f = 0.0
+    if f > 1.0: f = 1.0
+    return f
 
-
-def is_crop_name(name: Optional[str]) -> bool:
-    if not name:
-        return False
+def is_crop_name(name: str):
+    if not name: return False
     n = name.lower()
     return any(kw in n for kw in CROP_KEYWORDS)
 
-
-# ---------------------- Model handling ----------------------
-
+# ---------------- Model import ----------------
 YOLO = None
 try:
     from ultralytics import YOLO as _YOLO
     YOLO = _YOLO
-except Exception as e:  # pragma: no cover - handled at runtime
-    YOLO = None
+except Exception as e:
+    st.error("ultralytics import failed. Make sure your environment has 'ultralytics' installed (build-time).")
+    st.write("Detailed error:", str(e))
+    st.stop()
 
-
-@st.cache_resource
-def load_model_safe(path: str):
+def load_model_safe(path):
     if YOLO is None:
-        raise RuntimeError("ultralytics not available — install at build time")
-    if not os.path.exists(path):
-        raise FileNotFoundError(f"Model file not found: {path}")
-    # Allow ultralytics decide device; if it fails try cpu explicitly
+        raise RuntimeError("ultralytics not available")
     try:
         return YOLO(path)
     except Exception:
-        return YOLO(path, device="cpu")
+        try:
+            return YOLO(path, device="cpu")
+        except Exception as e:
+            raise
 
-
-def extract_topk_from_result(result: Any, k: int = TOP_K) -> List[Tuple[int, float]]:
-    """Extract top-k (class_id, confidence) tuples from an ultralytics result object.
-    This function is defensive against different ultralytics return shapes.
-    """
+def extract_topk_from_result(result, k=TOP_K):
     try:
         probs_obj = getattr(result, "probs", None)
         if probs_obj is not None:
-            # try convert to numpy if possible
-            try:
-                arr = np.array(probs_obj).flatten()
-                if arr.size:
-                    idxs = np.argsort(-arr)[:k]
-                    return [(int(i), float(arr[i])) for i in idxs]
-            except Exception:
-                # fallback to attributes
-                if hasattr(probs_obj, "top1") and hasattr(probs_obj, "top1conf"):
-                    return [(int(probs_obj.top1), float(probs_obj.top1conf))]
+            arr = np.array(probs_obj).flatten()
+            if arr.size:
+                idxs = np.argsort(-arr)[:k]
+                return [(int(i), float(arr[i])) for i in idxs]
     except Exception:
         pass
-
-    # fallback to boxes (common for detection models)
-    try:
-        boxes = getattr(result, "boxes", None)
-        if boxes is not None and len(boxes) > 0:
-            pairs: List[Tuple[int, float]] = []
-            for b in boxes:
-                try:
-                    pairs.append((int(b.cls), float(b.conf)))
-                except Exception:
-                    continue
-            pairs = sorted(pairs, key=lambda x: -x[1])[:k]
-            return pairs
-    except Exception:
-        pass
-
     return []
 
-
-# ---------------------- Labels & Remedies ----------------------
-
-BUILTIN_CLASS_MAPPING: Dict[int, str] = {
-    0: "American Bollworm on Cotton",
-    1: "Anthracnose on Cotton",
-    2: "Army worm",
-    10: "Healthy Maize",
-    11: "Healthy Wheat",
-}
-
-BUILTIN_REMEDIES_SHORT = {k: "General guidance — consult local extension for crop-specific chemical/dosage." for k in BUILTIN_CLASS_MAPPING}
-
-
-def load_labels_remedies(path: str = LABELS_REMEDIES_YAML) -> Tuple[Dict[int, str], Dict[int, Dict[str, Any]]]:
+# ---------------- Load labels/remedies YAML ----------------
+def load_labels_remedies(path="labels_remedies.yaml"):
     if not os.path.exists(path):
-        return BUILTIN_CLASS_MAPPING, {k: {"name": BUILTIN_CLASS_MAPPING[k], "summary": BUILTIN_REMEDIES_SHORT.get(k, ""), "details": ""} for k in BUILTIN_CLASS_MAPPING}
+        return None, None
     try:
         with open(path, "r", encoding="utf-8") as f:
-            data = yaml.safe_load(f) or {}
+            data = yaml.safe_load(f)
     except Exception:
-        return BUILTIN_CLASS_MAPPING, {k: {"name": BUILTIN_CLASS_MAPPING[k], "summary": BUILTIN_REMEDIES_SHORT.get(k, ""), "details": ""} for k in BUILTIN_CLASS_MAPPING}
-
-    class_map: Dict[int, str] = {}
-    remedies_full: Dict[int, Dict[str, Any]] = {}
-    if isinstance(data, dict):
-        for k, v in data.items():
-            try:
-                kid = int(k)
-            except Exception:
-                continue
-            if isinstance(v, dict):
-                class_map[kid] = v.get("name", f"Class {kid}")
-                remedies_full[kid] = {"name": class_map[kid], "summary": v.get("summary", ""), "details": v.get("details", "")}
-    if not class_map:
-        class_map = BUILTIN_CLASS_MAPPING
-        remedies_full = {k: {"name": BUILTIN_CLASS_MAPPING[k], "summary": BUILTIN_REMEDIES_SHORT.get(k, ""), "details": ""} for k in BUILTIN_CLASS_MAPPING}
+        return None, None
+    class_map = {}
+    remedies_full = {}
+    if not isinstance(data, dict):
+        return None, None
+    for k, v in data.items():
+        try:
+            kid = int(k)
+        except Exception:
+            continue
+        class_map[kid] = v.get("name", f"Class {kid}")
+        remedies_full[kid] = v
     return class_map, remedies_full
 
+CLASS_MAPPING, REMEDIES_FULL = load_labels_remedies("labels_remedies.yaml")
 
-CLASS_MAPPING, REMEDIES_FULL = load_labels_remedies()
-
-# ---------------------- Header UI ----------------------
-
+# ---------------- Header UI ----------------
 logo_file = find_logo_file()
 if logo_file:
     with open(logo_file, "rb") as f:
@@ -231,93 +169,73 @@ if logo_file:
 else:
     logo_html = '<div class="logo-box"><span style="font-weight:800;color:#fff">PS</span></div>'
 
-st.markdown(
-    f"""
+st.markdown(f"""
 <div class="header">
-  {logo_html}
-  <div>
-    <div class="title">Plant Sight</div>
-    <div class="subtitle">Fast disease ID • Clear remedial steps • Farmer-friendly</div>
-  </div>
+    {logo_html}
+    <div>
+        <div class="title">Plant Sight</div>
+        <div class="subtitle">Fast disease ID • Clear remedial steps • Farmer-friendly</div>
+    </div>
 </div>
-""",
-    unsafe_allow_html=True,
-)
+""", unsafe_allow_html=True)
 
-# ---------------------- Main container ----------------------
-
+# ---------------- Main container ----------------
 st.markdown('<div class="container">', unsafe_allow_html=True)
+
+# Hero / intro
 st.markdown('<div class="card">', unsafe_allow_html=True)
 st.markdown('<div class="hero-title">Plant Sight — Protect your crop, protect your livelihood</div>', unsafe_allow_html=True)
-st.markdown('<div class="hero-desc">Upload a clear close-up of the affected plant part (leaf, stem, boll, ear). The app detects crop pests/diseases and gives actionable guidance.</div>', unsafe_allow_html=True)
+st.markdown('<div class="hero-desc">Upload a clear close-up of the affected plant part (leaf, stem, boll, ear). The app detects crop pests/diseases and gives actionable guidance. If unsure, it will ask you to retake or crop the photo.</div>', unsafe_allow_html=True)
 st.markdown('</div>', unsafe_allow_html=True)
 
+# Uploader
 st.markdown('<div class="uploader card">', unsafe_allow_html=True)
-uploaded = st.file_uploader("Drag and drop file here", type=list(ALLOWED_EXTS))
+uploaded = st.file_uploader("Drag and drop file here", type=["jpg","jpeg","png"])
 st.markdown('</div>', unsafe_allow_html=True)
 
-# ---------------------- Model availability check ----------------------
-
-if YOLO is None:
-    st.error("ultralytics import failed. Make sure 'ultralytics' is installed in your environment at build time.")
-    st.stop()
-
+# Model check
 if not os.path.exists(MODEL_PATH):
-    st.error(f"Model file not found: {MODEL_PATH}. Place your trained model next to app.py.")
+    st.error(f"Model file not found: {MODEL_PATH}. Place your trained model next to app.py and name it {MODEL_PATH}")
     st.stop()
 
-# load model (cached)
 try:
     MODEL = load_model_safe(MODEL_PATH)
 except Exception as e:
-    st.error(f"Failed to load model: {e}")
+    st.error("Failed to load model. Check ultralytics installation and model file. Error: " + str(e))
     st.write(traceback.format_exc())
     st.stop()
 
-# ---------------------- Handle upload -> predict ----------------------
-
-if uploaded is not None:
+# ---------------- When uploaded -> predict & show ----------------
+if uploaded:
     try:
         uploaded_bytes = uploaded.getvalue()
     except Exception:
-        st.error("Unable to read uploaded file.")
-        st.stop()
+        uploaded_bytes = None
 
     try:
         pil = Image.open(io.BytesIO(uploaded_bytes)).convert("RGB")
     except Exception:
-        st.error("Unable to decode image. Try a different file.")
+        st.error("Unable to read uploaded image. Try another file.")
         st.stop()
 
     with st.spinner("Analyzing image..."):
         try:
-            # ultralytics accepts PIL.Image
             results = MODEL.predict(pil, save=False, verbose=False)
             r = results[0]
-            preds_raw = extract_topk_from_result(r, k=TOP_K)
+            preds_raw = extract_topk_from_result(r, k=TOP_K)   # list of (id, conf)
         except Exception as e:
             st.error("Prediction error: " + str(e))
             st.write(traceback.format_exc())
             st.stop()
 
-    # convert into display-friendly tuples: (name, conf_norm, id)
-    display_preds: List[Tuple[str, float, int]] = []
+    # Build display_preds: (name, conf_normalized, id)
+    display_preds = []
     for cid, conf in preds_raw:
         nconf = normalize_conf(conf)
         name = CLASS_MAPPING.get(int(cid), f"Class {cid}")
         display_preds.append((name, nconf, int(cid)))
 
-    # fallback attempt
-    if not display_preds:
-        try:
-            if hasattr(r, "probs") and hasattr(r.probs, "top1") and hasattr(r.probs, "top1conf"):
-                tid = int(r.probs.top1)
-                rc = normalize_conf(float(r.probs.top1conf))
-                display_preds = [(CLASS_MAPPING.get(tid, f"Class {tid}"), rc, tid)]
-        except Exception:
-            pass
-
-    # Layout
+    # Layout: image left, prediction right
     col1, col2 = st.columns([1.4, 1])
     with col1:
         st.markdown('<div class="card">', unsafe_allow_html=True)
@@ -326,57 +244,41 @@ if uploaded is not None:
 
     with col2:
         st.markdown('<div class="card">', unsafe_allow_html=True)
-
         top_name, top_conf, top_id = ("Unknown", 0.0, None)
         if display_preds:
             top_name, top_conf, top_id = display_preds[0]
 
-        name_crop_flag = is_crop_name(top_name)
         valid_class = (top_id in CLASS_MAPPING)
         confident = (top_conf >= CONF_THRESHOLD)
 
-        if confident and valid_class and name_crop_flag:
+        if confident and valid_class:
             st.markdown(f"#### 🔎 **Prediction:** {top_name}")
             st.markdown(f"**Confidence:** {int(top_conf * 100)}%")
             st.markdown(f'<div class="conf-bar"><div class="conf-fill" style="width:{int(top_conf*100)}%"></div></div>', unsafe_allow_html=True)
             st.markdown('---')
 
-            entry = REMEDIES_FULL.get(top_id)
-            remedy_summary = entry.get("summary") if entry else BUILTIN_REMEDIES_SHORT.get(top_id, "General guidance — consult local extension.")
-
-            st.markdown("#### 🌱 **Recommended Action**")
-            st.write(remedy_summary)
-            if entry and entry.get("details"):
+            entry = REMEDIES_FULL.get(top_id, None)
+            if entry:
+                summary = entry.get("summary", "")
+                details = entry.get("details", "")
+                st.markdown("#### 🌱 **Recommended Action**")
+                st.write(summary)
                 with st.expander("Read detailed guidance"):
-                    st.markdown(entry.get("details").replace("\n", "  \n"))
-
+                    st.markdown(details.replace("\n", "  \n"))
             st.caption("Remedies are guidance only — consult local extension for chemicals & dosages.")
-
-            rep = (
-                f"Plant Sight result\nTop prediction: {top_name} ({top_conf:.2f})\nRemedy: {remedy_summary}\n"
-            )
+            rep = f"Plant Sight result\nTop prediction: {top_name} ({top_conf:.2f})\nRemedy: {(entry.get('summary') if entry else '')}\n"
             st.download_button("📥 Download summary (.txt)", rep, file_name="plantsight_result.txt", use_container_width=True)
         else:
-            reason = "not_crop_or_low_conf"
-            saved = save_rejected_upload(uploaded_bytes, reason=reason)
-
             st.markdown("#### ⚠️ **No valid crop prediction**")
             if not confident:
                 st.error("Model confidence is low. Try a clearer close-up, better lighting, or crop the diseased area.")
-            elif not name_crop_flag:
-                st.error("This image does not look like a crop part. Please upload a leaf, stem, boll, or ear photo.")
             else:
                 st.error("No valid prediction — try another image.")
 
-            st.markdown('<div class="small">Tips: crop the disease patch, avoid humans/animals/food/objects, use natural light and fill the frame with the affected area.</div>', unsafe_allow_html=True)
-            st.markdown(f'<div class="small">Image saved for review: <code>{saved}</code></div>', unsafe_allow_html=True)
-
         st.markdown('</div>', unsafe_allow_html=True)
 
-    # Always allow image download
     st.download_button("🖼️ Download image", image_bytes(pil), file_name="input.png", use_container_width=True)
 
+# End container/footer
 st.markdown('</div>', unsafe_allow_html=True)
 st.markdown('<div class="footer">Plant Sight • Fast disease ID • Guidance only — consult local extension for chemicals & dosages</div>', unsafe_allow_html=True)
-
-# End of file
